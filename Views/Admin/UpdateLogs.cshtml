@@ -1,0 +1,114 @@
+﻿@using HKAdBus.Models.DomainModels
+@model IEnumerable<HKAdBus.Models.DomainModels.UpdateLog>
+@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Update Logs";
+}
+<style>
+    #updateLogTable {
+        width: 100%;
+    }
+
+        #updateLogTable th {
+            border: 1px solid black;
+        }
+
+        #updateLogTable tbody th {
+            font-weight: 100;
+        }
+
+    input {
+        width: 300px;
+    }
+</style>
+<script type="text/javascript">
+    function refreshTable(html) {
+        var startIndex = html.lastIndexOf("<thead>");
+        var endIndex = html.lastIndexOf("</tfoot>") + "</tfoot>".length;
+        $("#updateLogTable").html(html.substring(startIndex, endIndex + 1));
+    }
+
+    function addLog() {
+        var date = $("#date").val();
+        var description = $("#description").val();
+        if (date != null && date != "" && description != null && description != "") {
+            $.get("UpdateLogs?mode=add&date=" + date + "&description=" + description).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功新增更新紀錄</span>');
+                refreshTable(result);
+            });
+        } else {
+            $("#actionMessage").html('<span style="color:red;">日期及描述不能為空</span>');
+        }
+    }
+
+    function editLog(id, date, description) {
+        var originalHTML = $("#updateLog-" + id).html();
+        $("#updateLog-" + id).html('<th>' + id + '</th>'
+                                  + '<th><input type="text" id="newDate" value="' + date + '" /></th>'
+                                  + '<th><input type="text" id="newDescription" value="' + description + '" /></th>'
+                                  + '<th><button class="btn btn-primary" id="confirmEdit">確認修改</button> <button class="btn btn-default" id="cancelEdit">取消修改</button></th>');
+
+        $("#confirmEdit").click(function () {
+            // Update the log
+            var newDate = $("#newDate").val();
+            var newDescription = $("#newDescription").val();
+            $.get("UpdateLogs?mode=edit&logId=" + id + "&date=" + newDate + "&description=" + newDescription).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功修改更新紀錄 (號碼: ' + id + ')</span>');
+                refreshTable(result);
+            });
+        });
+        $("#cancelEdit").click(function () {
+            $("#updateLog-" + id).html(originalHTML);
+        });
+    }
+
+    function deleteLog(id) {
+        var r = confirm("確定要刪除更新紀錄 (號碼: " + id + ")?");
+        if (r == true) {
+            // Delete the log
+            $.get("UpdateLogs?mode=delete&logId=" + id).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功刪除更新紀錄 (號碼: ' + id + ')</span>');
+                refreshTable(result);
+            });
+        }
+    }
+</script>
+<div id="actionMessage"></div>
+<h3>管理更新紀錄</h3>
+<hr />
+<table id="updateLogTable">
+    <thead>
+        <tr>
+            <th style="width:5%;">ID</th>
+            <th style="width:20%;">更新日期</th>
+            <th>描述</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (UpdateLog log in Model)
+        {
+            <tr id="updateLog-@log.UpdateLogID">
+                <th>@log.UpdateLogID</th>
+                <th>@String.Format("{0:yyyy-MM-dd}", log.LogDate)</th>
+                <th>@log.Description</th>
+                <th>
+                    <button class="btn btn-primary" onclick="editLog(@log.UpdateLogID, '@String.Format("{0:yyyy-MM-dd}", log.LogDate)', '@log.Description')">修改</button>
+                    <button class="btn btn-danger" onclick="deleteLog(@log.UpdateLogID)">刪除</button>
+                </th>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="3">
+                新增更新紀錄: <input type="text" id="date" placeholder="更新日期" /> <input type="text" id="description" placeholder="描述" />
+            </th>
+            <th>
+                <button class="btn btn-primary" onclick="addLog()">確認新增</button>
+            </th>
+        </tr>
+    </tfoot>
+</table>
+<br />
+@Html.ActionLink("返回管理平台主頁", "Index")

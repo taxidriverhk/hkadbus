@@ -1,0 +1,54 @@
+﻿@using HKAdBus.Models.DomainModels
+@model HKAdBus.Models.EditorModels.HomeEditorViewModel
+@{
+    ViewBag.Title = "首頁";
+}
+<style>
+    #updateLogTable {
+        font-size: 14px;
+        width: 50%;
+    }
+
+        #updateLogTable th {
+            border: 1px solid black;
+            font-weight: 100 !important;
+        }
+
+        #updateLogTable tr:hover {
+            background-color: white;
+        }
+
+    input {
+        width: 300px;
+    }
+</style>
+<br />
+<div class="jumbotron">
+    <article style="font-size:14px;">
+        歡迎來到本網頁。本資料庫主要收藏由不同巴士迷攝影及提供的全車身廣告巴士相片。<br />
+        閣下可以瀏覽上有不同廣告類別及不同巴士型號的巴士相片，本站亦提供搜尋功能去尋找自己想看的相片。<br />
+        如閣下有任何意見及問題，歡迎到留言版留言。如有任何廣告巴士相片，亦歡迎提交至本站作紀錄 (閣下的名字亦會顯示在照片的詳細資料裡)。
+    </article>
+    <br />
+    <article style="font-size:14px;line-height:20px;">
+        Welcome! This database collects photos of buses of different full-body advertisements with different bus models taken by different bus fans.<br />
+        You can browse by advertisement's category or by bus model, search function is also provided to find the photos you want.<br />
+        If you have an comments or questions, please leave a post at the guestbook.<br />
+        You can also submit your own bus photos for our records (We would display your name on the details page of each of your photos).
+    </article>
+    <hr />
+    <h4>過去更新</h4>
+    <table id="updateLogTable">
+        <tbody>
+            @foreach (UpdateLog log in Model.UpdateLogs)
+            {
+                string logDate = String.Format("{0:yyyy-MM-dd}", log.LogDate); 
+                <tr>
+                    <th style="width:25%;">@logDate</th>
+                    <th>@log.Description</th>
+                    <th><a href="@Url.Content("~/Photo/Search?includeCreationDate=on&startDate=" + logDate + "&endDate=" + logDate)">瀏覽相片</a></th>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

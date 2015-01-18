@@ -1,0 +1,111 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* styles for validation helpers */
+.field-validation-error {
+    color: #b94a48;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #b94a48;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
+#pictureHeader {
+    min-height: 150px;
+    background-color: black;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+}
+
+.navResponsive li:hover {
+    background-color: lightgray;
+}
+.navResponsive li a:hover {
+    color: black !important;
+}
+
+.currentPage {
+    background-color: lightgray;
+    color: black !important;
+}
+
+.itemContainer {
+    width: 100%;
+}
+.itemContainer a {
+    color: black;
+}
+
+.itemBox {
+    width: 20%;
+    height: 200px;
+    text-align: center;
+    padding-top: 30px;
+    display: inline-block;
+    border: 1px solid #999999;
+    cursor: pointer;
+    margin: 2px 2px 2px 2px;
+}
+.itemBox img {
+    
+}
+
+    .itemBox:hover {
+        background-color: #dddddd;
+    }
+
+    .itemBox.kmb {
+        background-color: #e49595;
+    }
+        .itemBox.kmb:hover {
+            background-color: #ffd1d1;
+        }
+    .itemBox.ctb {
+        background-color: #f6da8b;
+    }
+        .itemBox.ctb:hover {
+            background-color: #fcf8cc;
+        }
+    .itemBox.cmb {
+        background-color: #9dedfb;
+    }
+        .itemBox.cmb:hover {
+            background-color: #b6e2dd;
+        }
+    .itemBox.nwfb {
+        background-color: #4aba49;
+    }
+        .itemBox.nwfb:hover {
+            background-color: #a3c19b;
+        }

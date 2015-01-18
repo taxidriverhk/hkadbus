@@ -1,0 +1,238 @@
+﻿@using HKAdBus.Models.DomainModels
+@model HKAdBus.Models.EditorModels.SearchViewModel
+@{
+    ViewBag.Title = "搜尋";
+}
+@helper addColor(BusCompany company)
+{
+    switch (company)
+    {
+        case BusCompany.CMB:
+            @:cmb
+            break;
+        case BusCompany.CTB:
+        @:ctb
+            break;
+        case BusCompany.KMB:
+        @:kmb
+            break;
+        case BusCompany.NWFB:
+        @:nwfb
+            break;
+    }
+}
+<style>
+    #invalidText {
+        color: red;
+    }
+    #searchBar {
+        width: 100%;
+        border: 1px solid #CCCCCC;
+    }
+    #searchBar table {
+        width: 100%;
+    }
+    #searchBar table td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .searchBox {
+        width: 90%;
+        margin-bottom: 2px;
+    }
+    .searchBox.half {
+        width: 40%;
+    }
+    .searchBox.short {
+        width: 25%;
+    }
+</style>
+<script>
+    var queries = jQuery.parseJSON('@Html.Raw(Model.ParametersJson)');
+    $(function () {
+        // Initialize the search bar
+        for (var key in queries) {
+            if (queries[key] != "") {
+                if (document.forms["search"][key].type === "text")
+                    document.forms["search"][key].value = queries[key];
+                else if(document.forms["search"][key].type === "checkbox")
+                    document.forms["search"][key].checked = true;
+            }
+        }
+    });
+
+    // Credit: https://gist.github.com/arth2o
+    function isValidDate(str, date) {
+        // STRING FORMAT yyyy-mm-dd
+        if (str == "" || str == null) { return false; }
+
+        // m[1] is year 'YYYY' * m[2] is month 'MM' * m[3] is day 'DD'					
+        var m = str.match(/(\d{4})-(\d{2})-(\d{2})/);
+
+        // STR IS NOT FIT m IS NOT OBJECT
+        if (m === null || typeof m !== 'object') { return false; }
+
+        // CHECK m TYPE
+        if (typeof m !== 'object' && m !== null && m.size !== 3) { return false; }
+
+        var ret = true; //RETURN VALUE						
+        var thisYear = new Date().getFullYear(); //YEAR NOW
+        var minYear = 1999; //MIN YEAR
+
+        // YEAR CHECK
+        if ((m[1].length < 4) || m[1] < minYear || m[1] > thisYear) { ret = false; }
+        // MONTH CHECK			
+        if ((m[2].length < 2) || m[2] < 1 || m[2] > 12) { ret = false; }
+        // DAY CHECK
+        if ((m[3].length < 2) || m[3] < 1 || m[3] > 31) { ret = false; }
+
+        date.m = m;
+        return ret;
+    }
+
+    function dateToTimeStamp(date) {
+        var m = date.m;
+        var newM = m[2] + "/" + m[3] + "/" + m[1];
+        return new Date(newM).getTime();
+    }
+
+    function validateSearch() {
+        var allValid = true;
+        var invalidText = "";
+        var redBorder = "1px solid red"
+        var form = document.forms["search"];
+        var startDate = new Object(), endDate = new Object();
+
+        if (form["includeTag"].checked == true && form["tag"].value === "") {
+            form["tag"].style.border = redBorder;
+            invalidText += "- 標籤不能為空<br />";
+            allValid = false;
+        }
+        if (form["includeFleet"].checked == true && form["fleetNumberPrefix"].value === "") {
+            form["fleetNumberPrefix"].style.border = redBorder;
+            invalidText += "- 車隊編號字首 (如: 3ASV, 11) 不能為空<br />";
+            allValid = false;
+        }
+        if (form["includeProvider"].checked == true && form["provider"].value === "") {
+            form["provider"].style.border = redBorder;
+            invalidText += "- 拍攝者/上傳者不能為空<br />";
+            allValid = false;
+        }
+        if (form["includeRoute"].checked == true && form["route"].value === "") {
+            form["route"].style.border = redBorder;
+            invalidText += "- 巴士路線不能為空<br />";
+            allValid = false;
+        }
+        if (form["includeLicence"].checked == true && form["licencePlate"].value === "") {
+            form["licencePlate"].style.border = redBorder;
+            invalidText += "- 車牌號碼不能為空<br />";
+            allValid = false;
+        }
+        if (form["includeCreationDate"].checked == true) {
+            if (form["startDate"].value === "" && form["endDate"].value === "") {
+                form["startDate"].style.border = redBorder;
+                form["endDate"].style.border = redBorder;
+                invalidText += "- 必須設定最少一邊日期範圍<br />";
+                allValid = false;
+            }
+            if (form["startDate"].value != "" && isValidDate(form["startDate"].value, startDate) === false) {
+                form["startDate"].style.border = redBorder;
+                invalidText += "- 最早日期格式錯誤<br />";
+                allValid = false;
+            }
+            if (form["endDate"].value != "" && isValidDate(form["endDate"].value, endDate) === false) {
+                form["endDate"].style.border = redBorder;
+                invalidText += "- 最晚日期格式錯誤<br />";
+                allValid = false;
+            }
+            if (allValid && form["startDate"].value != "" && form["endDate"].value != "") {
+                if (dateToTimeStamp(startDate) > dateToTimeStamp(endDate)) {
+                    form["startDate"].style.border = redBorder;
+                    form["endDate"].style.border = redBorder;
+                    invalidText += "- 最早日期不能晚於最晚日期<br />";
+                    allValid = false;
+                }
+            }
+        }
+        if (!form["includeTag"].checked && !form["includeFleet"].checked
+            && !form["includeProvider"].checked && !form["includeRoute"].checked
+            && !form["includeLicence"].checked && !form["includeCreationDate"].checked)
+        {
+            invalidText += "- 請最少設定一項搜尋條件<br />";
+            allValid = false;
+        }
+
+        if (!allValid) $("#invalidText").html(invalidText);
+
+        if (allValid === true) {
+            var timeInterval = 30 * 1000;
+            if (localStorage.hasOwnProperty("searchLimitFlag")) {
+                var flag = parseInt(localStorage.getItem("searchLimitFlag"));
+                if (flag > new Date().getTime()) {
+                    invalidText += "- 每次搜尋間隔不能少於" + (timeInterval / 1000) + "秒<br />";
+                    $("#invalidText").html(invalidText);
+                    return false;
+                }
+            }
+            localStorage.setItem("searchLimitFlag", (new Date().getTime()) + timeInterval);
+        }
+
+        return allValid;
+    }
+</script>
+<h3>搜尋</h3>
+<br />
+<div id="invalidText"></div>
+<div id="searchBar">
+    <form name="search" method="post" onsubmit="return validateSearch();">
+        <table>
+            <tr>
+                <td style="width:24%;">
+                    <label><input type="checkbox" name="includeTag" /> 車身廣告/標籤 (用逗號分隔多個標籤)</label><br />
+                    <br />
+                    <label><input type="checkbox" name="includeFleet" /> 車隊編號</label><br />
+                    <label><input type="checkbox" name="includeProvider" /> 拍攝者/上傳者</label> 
+                </td>
+                <td>
+                    <input type="text" class="searchBox" name="tag" placeholder="車身廣告/標籤" />
+                    <label><input type="checkbox" name="exactTagMatch" /> 一字不差</label><br />
+                    <input type="text" class="searchBox short" name="fleetNumberPrefix" placeholder="車隊字頭" /> 
+                    <input type="text" class="searchBox short" name="fleetNumber" placeholder="車隊編號" /><br />
+                    <input type="text" class="searchBox" name="provider" placeholder="拍攝者" /><br />
+                </td>
+                <td style="width:12%;">
+                    <label><input type="checkbox" name="includeRoute" /> 巴士路線</label><br />
+                    <label><input type="checkbox" name="includeLicence" /> 車牌號碼</label>
+                    <label><input type="checkbox" name="includeCreationDate" /> 上傳日期</label>
+                </td>
+                <td>
+                    <input type="text" class="searchBox" name="route" placeholder="巴士路線" /><br />
+                    <input type="text" class="searchBox" name="licencePlate" placeholder="車牌號碼 (英文連數字)" /><br />
+                    <input type="text" class="searchBox half" name="startDate" placeholder="晚於 YYYY-mm-DD" /> - 
+                    <input type="text" class="searchBox half" name="endDate" placeholder="早於 YYYY-mm-DD" /><br />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align:right;">
+                    <button type="submit" class="btn btn-primary">搜尋</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<br />
+<div class="itemContainer">
+    @if(@Model.NoResult)
+    {
+        <span>查無結果，請更改搜尋條件再試</span>
+    }
+    @foreach (var photo in Model.Photos)
+    {
+        <a href="@Url.Content("~/Photo/Details/" + @photo.PhotoID)">
+            <div class="itemBox @addColor(photo.BusCompany)">
+                <img src="@Url.Content(photo.Image)" /><br />
+                <span>@photo.BusModel.FleetPrefix.Split(',')[@photo.FleetPrefixIndex]@photo.FleetNumber  @photo.LicencePlateNumber</span>
+            </div>
+        </a>
+    }
+</div>

@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+<style>
+    input {
+        margin-bottom: 2px;
+    }
+</style>
+<script>
+    function toggleBoolean(e) {
+        if (e.value === 'false') {
+            e.value = 'true';
+        } else {
+            e.value = 'false';
+        }
+    }
+
+    $(function () {
+        @if(Request.QueryString.AllKeys.Contains("showInvalidText")
+        && Request["showInvalidText"] == "true")
+        {
+            @:$("#invalidLoginText").css("visibility", "visible");
+        }
+    });
+</script>
+<div style="margin-left:25%;padding-left:5px;width:50%;border:1px black solid;">
+    <h3>管理平台登入</h3>
+    <span style="visibility:hidden;color:red" id="invalidLoginText">登入名稱或密碼無效</span>
+    <form name="loginForm" method="post" action="@Url.Action("Login", "Login")">
+        @Html.AntiForgeryToken()
+        <label>登入名稱:</label> <input type="text" name="username" /><br />
+        <label>密碼:</label> <input type="password" name="password" /><br />
+        <input type="hidden" name="returnUrl" value="@Request["returnUrl"]" />
+        <label><input type="checkbox" name="rememberMe" value="false" onchange="toggleBoolean(this)" /> 五日內自動登入</label><br />
+        <button type="submit" class="btn btn-primary">登入</button><br /><br />
+    </form>
+</div>

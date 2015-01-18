@@ -1,0 +1,173 @@
+﻿@using HKAdBus.Models.DomainModels
+@using HKAdBus.Models.EditorModels
+@model HKAdBus.Models.EditorModels.AdminEditorViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Edit";
+    var photo = Model.Photo;
+}
+
+@helper AdvertisementDictionaryToMenu(Dictionary<string, List<Advertisement>> d)
+{
+    @:<select name="photo.AdvertisementID" id="advertisements" style="width:200px;">
+      foreach(string c in d.Keys)
+      {
+          @:<optgroup label="@c">
+            foreach(Advertisement a in d[c])
+            {
+                if(Model.Photo.AdvertisementID == a.AdvertisementID)
+                {
+                    @:<option value="@a.AdvertisementID" selected>@a.Name</option> 
+                }
+                else
+                {
+                    @:<option value="@a.AdvertisementID">@a.Name</option> 
+                }
+            }  
+          @:</optgroup>
+      }
+    @:</select>
+}
+
+<script>
+    var busModelMenuObj;
+    var selectedBusModelId;
+    var changeListCallBack = function () {
+        selectedBusModelId = busModelMenuObj.selectedIndex;
+        $("#fleetPrefixList").html(getFleetPrefix());
+    };
+
+    function getFleetPrefix() {
+        var result = '<select name="photo.FleetPrefixIndex">';
+        var fleetList = @Html.Raw(Model.FleetPrefixesJSON);
+        var busModelId = @Html.Raw(Model.Photo.BusModelID);
+        var fleetPrefixIndex = @Html.Raw(Model.Photo.FleetPrefixIndex);
+
+        for(var i = 0; i < fleetList[selectedBusModelId].length; i++) {
+            if(i === fleetPrefixIndex && selectedBusModelId == busModelId) {
+                result += '<option value="' + i + '" selected>' + fleetList[selectedBusModelId][i] + '</option>';
+            } else {
+                result += '<option value="' + i + '">' + fleetList[selectedBusModelId][i] + '</option>';
+            }
+        }
+
+        result += '</select>';
+        return result;
+    }
+
+    $(function () {
+        $("#advertisements").chosen();
+
+        busModelMenuObj = document.getElementById("photo_BusModelID");
+        busModelMenuObj.onchange = changeListCallBack;
+        changeListCallBack();
+    });
+</script>
+<style>
+    input[type="text"][name="photo.Image"] {
+        width: 400px;
+    }
+    input[type="text"][name="photo.FleetNumber"] {
+        width: 50px;
+    }
+    input[type="text"][name="photo.BusRoute"] {
+        width: 50px;
+    }
+    input[type="text"][name="photo.Tags"] {
+        width: 400px;
+    }
+</style>
+
+<h3>編輯相片</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => photo.PhotoID)
+        @Html.HiddenFor(model => photo.CreationDate)
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>圖片網址</label></div> 
+            <div class="col-md-10">
+                @Html.EditorFor(model => photo.Image)
+                @Html.ValidationMessageFor(model => photo.Image)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士廣告</label></div> 
+            <div class="col-md-10">
+                @AdvertisementDictionaryToMenu(Model.Categories)
+                @Html.ValidationMessageFor(model => photo.AdvertisementID)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士型號</label></div> 
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => photo.BusModelID,
+                                      new SelectList(AdminEditorViewModel.BusModels, "Value", "Text", photo.BusModelID))
+                @Html.ValidationMessageFor(model => photo.BusModelID)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士公司</label></div>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => photo.BusCompany, 
+                                      new SelectList(AdminEditorViewModel.BusCompanies, "Value", "Text", photo.BusCompany.ToString()))
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士路線</label></div>
+            <div class="col-md-10">
+                @Html.EditorFor(model => photo.BusRoute)
+                @Html.ValidationMessageFor(model => photo.BusRoute)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>車隊編號</label></div>
+            <div class="col-md-10">
+                <span id="fleetPrefixList"></span>
+                @Html.EditorFor(model => photo.FleetNumber)
+                @Html.ValidationMessageFor(model => photo.FleetNumber)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>車牌號碼</label></div>
+            <div class="col-md-10">
+                @Html.EditorFor(model => photo.LicencePlateNumber)
+                @Html.ValidationMessageFor(model => photo.LicencePlateNumber)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>上傳者</label></div>
+            <div class="col-md-10">
+                @Html.EditorFor(model => photo.Provider)
+                @Html.ValidationMessageFor(model => photo.Provider)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>標籤 (用逗號分隔)</label></div>
+            <div class="col-md-10">
+                @Html.EditorFor(model => photo.Tags)
+                @Html.ValidationMessageFor(model => photo.Tags)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="儲存" class="btn btn-primary" /> <input type="button" value="取消" class="btn btn-default" onclick="document.location='@Url.Action("Index", "Admin")'" />
+            </div>
+        </div>
+    </div>
+}

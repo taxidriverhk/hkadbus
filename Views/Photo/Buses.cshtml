@@ -1,0 +1,50 @@
+﻿@model HKAdBus.Models.EditorModels.BusesViewModel
+@{
+    ViewBag.Title = "巴士型號";
+}
+@{
+    int count = 0;
+}
+<style>
+    #busTable {
+        width: 100%;
+    }
+        #busTable tbody tr {
+            cursor: pointer;
+        }
+        #busTable tbody tr:hover {
+            background-color: #e5e5e5;
+        }
+        #busTable td {
+            border: 1px solid #808080;
+            padding: 5px 5px 5px 5px;
+        }
+        #busTable td img {
+            max-width: 70%;
+            height: auto;
+        }
+</style>
+<h3>巴士型號</h3>
+<br />
+<table id="busTable">
+    <thead>
+        <tr><td style="width:20%;"></td><td style="width:70%;">巴士型號</td><td>相片數目</td></tr>
+    </thead>
+    <tbody>
+        @foreach (var key in Model.BusImagePairs.Keys)
+        {
+            <tr id="row-@count">
+                <td>
+                    <script>
+                        $("#row-@count").click(function () {
+                            window.location = "@Url.Content("~/Photo/Bus/" + @key.BusModelID)";
+                        });
+                    </script>
+                    <img src="@Url.Content(Model.BusImagePairs[key].Thumbnail)" />
+                </td>
+                <td>@key.Name</td><td>@Model.BusImagePairs[key].Count</td>
+            </tr>
+            count++;
+        }
+    </tbody>
+</table>

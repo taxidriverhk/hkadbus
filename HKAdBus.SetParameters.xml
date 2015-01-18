@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="IIS Web Application Name" value="others/hkadbus" />
+  <setParameter name="HKAdBusDBContext-Web.config Connection String" value="Data Source=WIN-FDMPC5VFSEE\SQLEXPRESS;Initial Catalog=HKAdBus;User ID=HKAdBusUser;Password=●●●●●●●●;MultipleActiveResultSets=True" />
+</parameters>

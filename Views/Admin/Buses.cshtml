@@ -1,0 +1,96 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Buses";
+}
+<style>
+    #busTable {
+        width: 70%;
+    }
+        #busTable thead,tfoot th {
+            background-color: #CCCCCC;
+        }
+        #busTable th,td {
+            border: 1px black solid;
+            font-weight: 100;
+        }
+
+    input[type="text"] {
+        width: 300px;
+    }
+
+    a {
+        cursor: pointer;
+    }
+</style>
+<script type="text/javascript">
+    function addBus() {
+        var name = $("#newBusName").val();
+        var prefixes = $("#newBusFleetPrefixes").val();
+        if (name != null && prefixes != null && name != "" && prefixes != "") {
+            // Add the bus
+            $.get("BusList?mode=addBus&newBusName=" + name + "&newFleetPrefixes=" + prefixes).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功新增巴士型號"' + name + '"</span>');
+                // Refresh the table
+                $.get("BusList?mode=view").done(function (result) {
+                    $("#busTableContainer").html(result);
+                });
+            });
+        } else {
+            $("#actionMessage").html('<span style="color:red;">巴士名稱及車隊編號字首不能為空</span>');
+        }
+    }
+
+    function editBus(id, name, prefix) {
+        var originalHTML = $("#busrow-" + id).html();
+        var editingHTML = '<th><input type="text" id="editBusName" value="' + name + '" /></th>'
+                          + '<th><input type="text" id="editFleetPrefixes" value="' + prefix + '" /></th>'
+                          + '<th><button class="btn btn-primary" id="submitEditButton">儲存</button> <button class="btn btn-default" id="cancelEditButton">取消</button></th>';
+
+        $("#busrow-" + id).html(editingHTML);
+
+        $("#submitEditButton").click(function () {
+            var newName = $("#editBusName").val();
+            var newPrefixes = $("#editFleetPrefixes").val();
+            if(newName != null && newPrefixes != null && newName != "" && newPrefixes != "") {
+                // Edit the bus
+                $.get("BusList?mode=editBus&busId=" + id + "&newBusName=" + newName + "&newFleetPrefixes=" + newPrefixes).done(function (result) {
+                    $("#actionMessage").html('<span style="color:green;">成功修改巴士型號"' + name + '"為"' + newName + '"</span>');
+                    // Refresh the table
+                    $.get("BusList?mode=view").done(function (result) {
+                        $("#busTableContainer").html(result);
+                    });
+                });
+            } else {
+                $("#actionMessage").html('<span style="color:red;">巴士名稱及車隊編號字首不能為空</span>');
+            }
+        });
+        $("#cancelEditButton").click(function () {
+            $("#busrow-" + id).html(originalHTML);
+        });
+    }
+
+    function deleteBus(id, name) {
+        var r = confirm("確定要刪除巴士\"" + name + "\"? 所屬的所有相片也會被刪除。\n" +
+                        "(如廣告只剩餘此巴士型號之相片，那該等廣告將會被留下來，須稍後以人手刪除)");
+        if (r == true) {
+            // Delete the bus
+            $.get("BusList?mode=deleteBus&busId=" + id).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功刪除巴士型號"' + name + '"</span>');
+                // Refresh the table
+                $.get("BusList?mode=view").done(function (result) {
+                    $("#busTableContainer").html(result);
+                });
+            });
+        }
+    }
+</script>
+<div id="actionMessage"></div>
+<h3>巴士型號列表</h3>
+<hr />
+<div id="busTableContainer">
+    @{
+        Html.RenderAction("BusList", new { mode = "view" });
+    }
+</div>
+<br />
+@Html.ActionLink("返回管理平台主頁", "Index")

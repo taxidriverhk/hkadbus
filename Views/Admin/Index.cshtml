@@ -1,0 +1,104 @@
+﻿@model IEnumerable<HKAdBus.Models.DomainModels.Photo>
+
+@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Index";
+}
+@Styles.Render("~/Content/DataTables-1.10.4/css/jquery.dataTables.css")
+@Scripts.Render("~/Scripts/DataTables-1.10.4/jquery.dataTables.js")
+<script>
+    $(document).ready(function () {
+        $('#photoTable').DataTable({
+            initComplete: function () {
+                var api = this.api();
+
+                api.columns().indexes().flatten().each(function (i) {
+                    if (i == 0 || i == 1 || i == 12)
+                        return;
+                    var column = api.column(i);
+                    var select = $('<select><option value="">所有</option></select>')
+                        .appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+
+                            column
+                                .search(val ? '^' + val + '$' : '', true, false)
+                                .draw();
+                        });
+
+                    column.data().unique().sort().each(function (d, j) {
+                        select.append('<option value="' + d + '">' + d + '</option>')
+                    });
+                });
+            },
+            order: [[0, "desc"]],
+        });
+    });
+</script>
+<h3>相片管理平台</h3>
+<p>
+    @Html.ActionLink("新增照片", "Create") | @Html.ActionLink("廣告列表", "Advertisements") | @Html.ActionLink("巴士型號列表", "Buses") 
+    | @Html.ActionLink("管理用戶留言", "Guestbook") | @Html.ActionLink("管理更新紀錄", "UpdateLogs")
+</p>
+<br />
+<table class="table" id="photoTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>圖片網址</th>
+            <th>廣告類別</th>
+            <th>廣告名稱</th>
+            <th>巴士型號</th>
+            <th>建立日期</th>
+            <th>巴士公司</th>
+            <th>巴士路線</th>
+            <th>車隊編號</th>
+            <th>車牌號碼</th>
+            <th>上傳者</th>
+            <th>標籤</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.ActionLink(item.PhotoID.ToString(), "Details", new { id = item.PhotoID })</td>
+                <td><img src="@Url.Content(item.Image)" style="width:120px;height:84px;" /></td>
+                <td>@Html.DisplayFor(modelItem => item.Advertisement.Category.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Advertisement.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.BusModel.Name)</td>
+                <td>@String.Format("{0:yyyy-MM-dd}", item.CreationDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.BusCompany)</td>
+                <td>@Html.DisplayFor(modelItem => item.BusRoute)</td>
+                <td>@item.BusModel.FleetPrefix.Split(',')[item.FleetPrefixIndex]@Html.DisplayFor(modelItem => item.FleetNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.LicencePlateNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.Provider)</td>
+                <td>@Html.DisplayFor(modelItem => item.Tags)</td>
+                <td>
+                    @Html.ActionLink("編輯", "Edit", new { id = item.PhotoID }) |
+                    @Html.ActionLink("刪除", "Delete", new { id = item.PhotoID })
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>

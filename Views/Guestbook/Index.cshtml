@@ -1,0 +1,160 @@
+﻿
+@{
+    ViewBag.Title = "留言版";
+}
+
+<style>
+    #newPostContainer {
+        width: 100%;
+        border: 1px solid black;
+    }
+
+    #guestbookContainer table {
+        width: 100%;
+        border: 1px solid black;
+    }
+    #guestbookContainer table tr:nth-child(2) {
+        background-color: lightgray;
+    }
+    #guestbookContainer table tr:nth-child(2) div {
+        margin: 5px 5px 5px 5px;
+        background-color: #fff2ad;
+    }
+    
+    input {
+        min-width: 500px !important;
+        margin-bottom: 2px;
+    }
+
+    textarea {
+        min-width: 800px !important;
+        min-height: 200px !important;
+        resize: none;
+        margin-bottom: 2px;
+    }
+</style>
+<script>
+    var invalidMessage;
+    var name, email, website, message;
+
+    function resetInputStyle() {
+        $("#name, #email, #website").css("border", "2px inset");
+        $("#message").css({
+            "border": "1px solid",
+            "border-color": "rgb(169, 169, 169)"
+        });
+    }
+
+    function validatePost() {
+        resetInputStyle();
+        invalidMessage = "";
+        var basicValidation = name != null && name != "" && message != null && message.length >= 10;
+        var anyInvalid = false;
+
+        // Validate email address if given
+        if (email != null && email != "") {
+            var atpos = email.indexOf("@@");
+            var dotpos = email.lastIndexOf(".");
+            if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) {
+                invalidMessage += '<span style="color:red;">- 電郵地址格式錯誤</span><br />';
+                $("#email").css("border", "1px solid red");
+                anyInvalid = true;
+            }
+        }
+        // Validate website URL if given
+        if (website != null && website != "") {
+            var dotpos = website.indexOf(".");
+            if (dotpos < 1 || dotpos + 1 >= website.length) {
+                invalidMessage += '<span style="color:red;">- 個人網頁網址格式錯誤</span><br />';
+                $("#website").css("border", "1px solid red");
+                anyInvalid = true;
+            }
+        }
+        
+        // Validate the required fields
+        if (name == null || name == "") {
+            $("#name").css("border", "1px solid red");
+            invalidMessage += '<span style="color:red;">- 名稱不能為空</span><br />';
+        }
+        if (message == null || message.length < 10) {
+            $("#message").css("border", "1px solid red");
+            invalidMessage += '<span style="color:red;">- 訊息長度不能少於10字元</span><br />';
+        }
+
+        var timeInterval = 24 * 3600 * 1000;
+        if (localStorage.hasOwnProperty("postLimitFlag")) {
+            var flag = parseInt(localStorage.getItem("postLimitFlag"));
+            if (flag > new Date().getTime()) {
+                invalidMessage += '<span style="color:red;">- 每次留言張貼間隔不能少於24小時</span><br /><br />';
+                return false;
+            }
+        }
+        localStorage.setItem("postLimitFlag", (new Date().getTime()) + timeInterval);
+
+        return basicValidation && !anyInvalid;
+    }
+
+    function postToGuestbook() {
+        name = $("#name").val();
+        email = $("#email").val();
+        website = $("#website").val();
+        message = $("#message").val();
+
+        // Validate the post first
+        if (!validatePost()) {
+            $("#actionMessage").html(invalidMessage);
+            return;
+        }
+
+        // Then post the message
+        $.post("@Url.Content("~/Guestbook/GuestBookEntryList")",
+               {
+                   "mode": "add",
+                   "name": name,
+                   "email": email,
+                   "website": website,
+                   "message": message,
+                   "__RequestVerificationToken": $('[name=__RequestVerificationToken]').val()
+               },
+               function (result) {
+                   resetInputStyle();
+                   $("#actionMessage").html('<span style="color:green;">留言成功張貼</span><br />');
+                   $("#guestbookContainer").html(result);
+               });
+    }
+
+    function clearEverything() {
+        $("#name, #email, #website, #message").val("");
+    }
+
+    $(function () {
+        $.post("@Url.Content("~/Guestbook/GuestBookEntryList")",
+              { "__RequestVerificationToken": $('[name=__RequestVerificationToken]').val() },
+              function (result) {
+                  $("#guestbookContainer").html(result);
+              });
+    });
+</script>
+<h3>留言版</h3>
+<hr />
+<h4>張貼新留言</h4>
+@Html.AntiForgeryToken()
+<table id="newPostContainer">
+    <tr>
+        <td>
+            <span id="actionMessage"></span>
+            名稱:<br /><input type="text" id="name" placeholder="必須填寫" /><br />
+            聯絡電郵:<br /><input type="text" id="email" placeholder="可選填" /><br />
+            個人網頁:<br /><input type="text" id="website" placeholder="可選填" /><br />
+            訊息:<br />
+            <textarea id="message" placeholder="長度必須最少10個字元"></textarea><br />
+
+            <button id="submit" class="btn btn-primary" onclick="postToGuestbook()">確認張貼</button> <button id="reset" class="btn btn-danger" onclick="clearEverything()">清除內容</button>
+        </td>
+    </tr>
+
+</table>
+<br /><br />
+<h4>現有留言</h4>
+<div id="guestbookContainer">
+</div>

@@ -1,0 +1,40 @@
+﻿@using HKAdBus.Models.DomainModels
+@model HKAdBus.Models.EditorModels.AdvertisementViewModel
+@{
+    var advertisement = Model.Advertisement;
+    ViewBag.Title = advertisement.Name;
+}
+@helper addColor(BusCompany company)
+{
+    switch(company)
+    {
+        case BusCompany.CMB:
+            @:cmb 
+            break;
+        case BusCompany.CTB:
+            @:ctb 
+            break;
+        case BusCompany.KMB:
+            @:kmb
+            break;
+        case BusCompany.NWFB:
+            @:nwfb
+            break;
+    }
+}
+<h5>
+    <a href="@Url.Content("~/Photo/Categories")">廣告分類</a>  &gt;  
+    <a href="@Url.Content("~/Photo/Category/" + @advertisement.Category.CategoryID)">@advertisement.Category.Name</a> &gt; 
+    @advertisement.Name
+</h5>
+<div class="itemContainer">
+    @foreach (var photo in advertisement.Photos)
+    {
+        <a href="@Url.Content("~/Photo/Details/" + @photo.PhotoID)">
+            <div class="itemBox @addColor(photo.BusCompany)">
+                <img src="@Url.Content(@photo.Image)" /><br />
+                <span>@photo.BusModel.FleetPrefix.Split(',')[@photo.FleetPrefixIndex]@photo.FleetNumber  @photo.LicencePlateNumber</span>
+            </div>
+        </a>
+    }
+</div>

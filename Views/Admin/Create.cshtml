@@ -1,0 +1,149 @@
+﻿@using HKAdBus.Models.DomainModels
+@using HKAdBus.Models.EditorModels
+@model HKAdBus.Models.EditorModels.AdminEditorViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Create";
+}
+
+@helper AdvertisementDictionaryToMenu(Dictionary<string, List<Advertisement>> d)
+{
+    @:<select name="photo.AdvertisementID" id="advertisements" style="width:200px;">
+      foreach (string c in d.Keys)
+      {
+        @:<optgroup label="@c">
+            foreach (Advertisement a in d[c])
+            {
+                @:<option value="@a.AdvertisementID">@a.Name</option>
+            }
+        @:</optgroup>
+      }
+    @:</select>
+}
+
+<script>
+    var busModelMenuObj;
+    var selectedBusModelId;
+    var changeListCallBack = function () {
+        selectedBusModelId = busModelMenuObj.selectedIndex;
+        $("#fleetPrefixList").html(getFleetPrefix());
+    };
+
+    function getFleetPrefix() {
+        var result = '<select name="photo.FleetPrefixIndex">';
+        var fleetList = @Html.Raw(Model.FleetPrefixesJSON);
+        
+        for(var i = 0; i < fleetList[selectedBusModelId].length; i++) {
+            result += '<option value="' + i + '">' + fleetList[selectedBusModelId][i] + '</option>';
+        }
+
+        result += '</select>';
+        return result;
+    }
+
+    $(function () {
+        $("#advertisements").chosen();
+
+        busModelMenuObj = document.getElementById("Photo_BusModelID");
+        busModelMenuObj.onchange = changeListCallBack;
+        changeListCallBack();
+    });
+</script>
+<style>
+    input[type="text"][name="photo.Image"] {
+        width: 400px;
+    }
+
+    input[type="text"][name="photo.FleetNumber"] {
+        width: 50px;
+    }
+
+    input[type="text"][name="photo.BusRoute"] {
+        width: 50px;
+    }
+    input[type="text"][name="photo.Tags"] {
+        width: 400px;
+    }
+</style>
+
+<h3>建立相片</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>圖片網址</label></div>
+            <div class="col-md-10">
+                <input type="text" name="photo.Image" value="@Html.Raw("~/img/photos")" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士廣告</label></div>
+            <div class="col-md-10">
+                @AdvertisementDictionaryToMenu(Model.Categories)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士型號</label></div>
+            <div class="col-md-10">
+                @Html.DropDownListFor(photo => Model.Photo.BusModelID,
+                                      new SelectList(AdminEditorViewModel.BusModels, "Value", "Text"))
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士公司</label></div>
+            <div class="col-md-10">
+                @Html.DropDownListFor(photo => Model.Photo.BusCompany,
+                                      new SelectList(AdminEditorViewModel.BusCompanies, "Value", "Text"))
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>巴士路線</label></div>
+            <div class="col-md-10">
+                <input type="text" name="photo.BusRoute" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>車隊編號</label></div>
+            <div class="col-md-10">
+                <span id="fleetPrefixList"></span>
+                <input type="text" name="photo.FleetNumber" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>車牌號碼</label></div>
+            <div class="col-md-10">
+                <input type="text" name="photo.LicencePlateNumber" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>上傳者</label></div>
+            <div class="col-md-10">
+                <input type="text" name="photo.Provider" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2"><label>標籤 (用逗號分隔)</label></div>
+            <div class="col-md-10">
+                <input type="text" name="photo.Tags" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="建立" class="btn btn-primary" /> <input type="button" value="取消" class="btn btn-default" onclick="document.location='@Url.Action("Index", "Admin")'" ; />
+            </div>
+        </div>
+    </div>
+}

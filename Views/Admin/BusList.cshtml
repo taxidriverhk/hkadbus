@@ -1,0 +1,34 @@
+﻿@using HKAdBus.Models.DomainModels
+@model HKAdBus.Models.EditorModels.BusListViewModel
+@{
+    Layout = null;
+    ViewBag.Title = "BusList";
+}
+<table id="busTable">
+    <thead>
+        <tr>
+            <th style="width:50%;">巴士型號</th>
+            <th style="width:30%;">車隧編號 (以逗號分隔)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(BusModel b in Model.Buses)
+        {
+            @:<tr id="busrow-@b.BusModelID">
+                @:<th>@b.Name [相片數目: @Model.PhotoCounts[b.BusModelID]]</th>
+                @:<th>@b.FleetPrefix</th>
+                @:<th><a onclick="editBus(@b.BusModelID, '@b.Name', '@b.FleetPrefix')">修改</a> | <a onclick="deleteBus(@b.BusModelID, '@b.Name')">刪除</a></th>
+            @:</tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="3">
+                新增巴士型號: <input type="text" id="newBusName" placeholder="型號名稱 (包括品牌)" /> 
+                <input type="text" id="newBusFleetPrefixes" placeholder="車隊編號字首 (以逗號分隔)" /> 
+                <button class="btn btn-primary" onclick="addBus()">新增</button>
+            </th>
+        </tr>
+    </tfoot>
+</table>

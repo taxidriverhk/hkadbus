@@ -1,0 +1,25 @@
+﻿@using HKAdBus.Others
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理平台 - Hong Kong Advertised Bus Photo Database</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/chosen.min.css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/Scripts/chosen.jquery.min.js")
+    @Scripts.Render("~/Scripts/chosen.proto.min.js")
+</head>
+<body style="padding: 5px 5px;">
+    @if(Request.IsAuthenticated)
+    {
+        <div style="text-align:right;height:30px;">已使用身份 @User.Identity.Name 登入 | <a href="@Url.Action("Logout", "Login")">登出</a></div>
+    }
+    @RenderBody()
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,121 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Advertisements";
+}
+<style>
+    #adTable {
+        width: 70%;
+    }
+
+        #adTable td {
+            border: 1px black solid;
+        }
+
+    input[type="text"] {
+        width: 300px;
+    }
+
+    a {
+        cursor: pointer;
+    }
+</style>
+<script type="text/javascript">
+    function addCategory() {
+        var name = $("#newCategoryName").val();
+        if (name != "" && name != null) {
+            // Add the category
+            $.get("AdvertisementList?mode=addCate&newCateName=" + name).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功新增類別"' + name + '"</span>');
+                // Refresh the table
+                $.get("AdvertisementList?mode=view").done(function (result) {
+                    $("#adTableContainer").html(result);
+                });
+            });
+        } else {
+            $("#actionMessage").html('<span style="color:red;">類別名稱不能為空</span>');
+        }
+    }
+
+    function addAdvertisement(categoryId) {
+        var name = $("#newAdvertisementName-" + categoryId).val();
+        if (name != "" && name != null) {
+            // Add the advertisement
+            $.get("AdvertisementList?mode=addAd&cateId=" + categoryId + "&newAdName=" + name).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功新增廣告"' + name + '"</span>');
+                // Refresh the table
+                $.get("AdvertisementList?mode=view").done(function (result) {
+                    $("#adTableContainer").html(result);
+                });
+            });
+        } else {
+            $("#actionMessage").html('<span style="color:red;">廣告名稱不能為空</span>');
+        }
+    }
+
+    function editCategory(cateName, categoryId) {
+        var name = prompt("請在修改後按確定，或取消修改。", cateName);
+        if (name != null && name != "") {
+            // Edit the category
+            $.get("AdvertisementList?mode=editCate&cateId=" + categoryId + "&newCateName=" + name).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功修改類別"' + cateName + '"為"' + name + '"</span>');
+                // Refresh the table
+                $.get("AdvertisementList?mode=view").done(function (result) {
+                    $("#adTableContainer").html(result);
+                });
+            });
+        }
+    }
+
+    function editAdvertisement(adName, adId) {
+        var name = prompt("請在修改後按確定，或取消修改。", adName);
+        if (name != null && name != "") {
+            // Edit the advertisement
+            $.get("AdvertisementList?mode=editAd&adId=" + adId + "&newAdName=" + name).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功修改廣告"' + adName + '"為"' + name + '"</span>');
+                // Refresh the table
+                $.get("AdvertisementList?mode=view").done(function (result) {
+                    $("#adTableContainer").html(result);
+                });
+            });
+        }
+    }
+
+    function deleteCategory(cateName, categoryId) {
+        var r = confirm("確定要刪除類別\"" + cateName + "\"? 所屬的所有廣告及相片也會被刪除。");
+        if (r == true) {
+            // Delete the category
+            $.get("AdvertisementList?mode=deleteCate&cateId=" + categoryId).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功刪除類別"' + cateName + '"</span>');
+                // Refresh the table
+                $.get("AdvertisementList?mode=view").done(function (result) {
+                    $("#adTableContainer").html(result);
+                });
+            });
+        }
+    }
+
+    function deleteAdvertisement(adName, adId) {
+        var r = confirm("確定要刪除廣告\"" + adName + "\"? 所屬的所有相片也會被刪除。");
+        if (r == true) {
+            // Delete the advertisement
+            $.get("AdvertisementList?mode=deleteAd&adId=" + adId).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功刪除廣告"' + adName + '"</span>');
+                // Refresh the table
+                $.get("AdvertisementList?mode=view").done(function (result) {
+                    $("#adTableContainer").html(result);
+                });
+            });
+        }
+    }
+</script>
+<div id="actionMessage"></div>
+<h3>廣告列表</h3>
+<hr />
+<div id="adTableContainer">
+    @{
+        Html.RenderAction("AdvertisementList", new { mode = "view" });
+    }
+</div>
+<br />
+@Html.ActionLink("返回管理平台主頁", "Index")

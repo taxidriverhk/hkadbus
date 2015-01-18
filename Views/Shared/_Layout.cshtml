@@ -1,0 +1,56 @@
+﻿@using HKAdBus.Others
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Hong Kong Advertised Bus Photo Database</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    <script type="text/javascript">
+        function itemImageResize() {
+            var imageScale = $(".itemBox img").width() / $(".itemBox img").height();
+            $(".itemBox img").css("width", parseInt($(".itemBox").width() * 0.8));
+            $(".itemBox img").css("height", parseInt($(".itemBox img").width() / imageScale));
+
+            var occupiedWidth = $(".itemBox").width() * Math.floor($(".itemContainer").width() / ($(".itemBox").width()+4));
+            $(".itemContainer").css("margin-left", parseInt(($(".itemContainer").width() - occupiedWidth) / 2) + "px");
+        }
+
+        $(window).load(function () {
+            var pictureId = Math.floor(Math.random() * 5 + 1);
+            $("#pictureHeader").css("background-image", "url(@Url.Content("~/img/header")" + pictureId + ".jpg)");
+
+            itemImageResize();
+        });
+        $(window).resize(itemImageResize);
+    </script>
+</head>
+<body style="padding-top: 0px;">
+    <div class="container navbar-inverse" style="color:#999999;"><h3>Hong Kong Advertised Bus Photo Database</h3></div>
+    <div class="container" id="pictureHeader"></div>
+    <div class="container navbar-inverse" style="padding-left:0px;">
+        <ul class="nav navbar-nav navResponsive">
+            <li>@Html.NavigationLink("首頁 Home", "Index", "Home")</li>
+            <li>@Html.NavigationLink("廣告分類 Categories", "Categories", "Photo")</li>
+            <li>@Html.NavigationLink("巴士型號 Bus Models", "Buses", "Photo")</li>
+            <li>@Html.NavigationLink("搜尋 Search", "Search", "Photo")</li>
+            <li>@Html.NavigationLink("留言版 Guestbook", "Index", "Guestbook")</li>
+            <li>@Html.NavigationLink("提交相片 Submit Photo", "Submit", "Home")</li>
+        </ul>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2010-@DateTime.Now.Year - Hong Kong Advertised Bus Photo Database</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

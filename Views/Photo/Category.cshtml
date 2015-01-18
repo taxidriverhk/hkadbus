@@ -1,0 +1,19 @@
+﻿@model HKAdBus.Models.EditorModels.CategoryViewModel
+@{
+    ViewBag.Title = Model.CategoryName;
+}
+<h5>
+    <a href="@Url.Content("~/Photo/Categories")">廣告分類</a>  &gt; 
+    @Model.CategoryName
+</h5>
+<div class="itemContainer">
+    @foreach (var key in Model.Pairs.Keys)
+    {
+        <a href="@Url.Content("~/Photo/Advertisement/" + @key.AdvertisementID)">
+            <div class="itemBox">
+                <img src="@Url.Content(@Model.Pairs[key].Thumbnail)" /><br />
+                <span>@key.Name (@Model.Pairs[key].Count)</span>
+            </div>
+        </a>
+    }
+</div>

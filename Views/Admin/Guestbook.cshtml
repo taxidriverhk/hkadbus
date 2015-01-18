@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Guestbook";
+}
+<style>
+    #guestbookPostContainer table {
+        width: 100%;
+        border: 1px solid black;
+    }
+
+        #guestbookPostContainer table tr:nth-child(1) {
+            background-color: #ffa1a1;
+        }
+
+        #guestbookPostContainer table tr:nth-child(3) {
+            background-color: lightgray;
+        }
+
+            #guestbookPostContainer table tr:nth-child(3) div {
+                margin: 5px 5px 5px 5px;
+                background-color: #fff2ad;
+            }
+
+    #editReply {
+        width: 400px;
+    }
+</style>
+<script type="text/javascript">
+    function replyPost(id) {
+        var originalHTML = $("#editPost").html();
+        $("#editPost").html('<input type="text" id="replyText" placeholder="回覆訊息" /> '
+                            + '<button class="btn btn-primary" id="confirmReply">確認回覆</button>'
+                            + ' <button class="btn btn-default" id="cancelReply">取消回覆</button>');
+
+        $("#confirmReply").click(function () {
+            // Reply the post
+            var replyText = $("#replyText").val();
+            $.get("GuestbookList?mode=reply&postId=" + id + "&reply=" + replyText).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功回覆留言</span>');
+                $("#guestbookPostContainer").html(result);
+            });
+        });
+        $("#cancelReply").click(function () {
+            $("#editPost").html(originalHTML);
+        });
+    }
+
+    function deletePost(id) {
+        var r = confirm("確定要刪除留言 (號碼: " + id + ")?");
+        if (r == true) {
+            // Delete the post
+            $.get("GuestbookList?mode=delete&postId=" + id).done(function (result) {
+                $("#actionMessage").html('<span style="color:green;">成功刪除留言 (號碼: ' + id + ')</span>');
+                $("#guestbookPostContainer").html(result);
+            });
+        }
+    }
+</script>
+<div id="actionMessage"></div>
+<h3>管理用戶留言</h3>
+<hr />
+<div id="guestbookPostContainer">
+    @{
+        Html.RenderAction("GuestbookList", new { mode = "view" });
+    }
+</div>
+<br />
+@Html.ActionLink("返回管理平台主頁", "Index")

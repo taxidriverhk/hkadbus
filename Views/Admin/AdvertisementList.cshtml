@@ -1,0 +1,20 @@
+﻿@using HKAdBus.Models.DomainModels
+@model HKAdBus.Models.EditorModels.AdvertisementListViewModel
+@{ 
+    Layout = null;
+}
+<table id="adTable">
+    @foreach(Category c in Model.Categories)
+    {
+        @:<tr style="background-color:lightgray;"><td colspan="2">@c.Name</td>
+        @:<td style="width:10%;"><a onclick="editCategory('@c.Name', @c.CategoryID)">修改</a> | <a onclick="deleteCategory('@c.Name', @c.CategoryID)">刪除</a></td></tr>
+        foreach(Advertisement a in c.Advertisements)
+        {
+            @:<tr><td style="width:5%;"></td><td>@a.Name [相片數目: @Model.PhotoCounts[a.AdvertisementID]]</td>
+            @:<td style="width:10%;"><a onclick="editAdvertisement('@a.Name', @a.AdvertisementID)">修改</a> | <a onclick="deleteAdvertisement('@a.Name', @a.AdvertisementID)">刪除</a></td></tr>
+        }
+        @:<tr><td style="width:5%;"></td>
+        @:<td colspan="2">新增廣告: <input type="text" id="newAdvertisementName-@c.CategoryID" /> <button class="btn btn-primary" onclick="addAdvertisement(@c.CategoryID)">新增</button></td></tr>
+    }
+    <tr style="background-color:lightgray;"><td colspan="3">新增類別: <input type="text" id="newCategoryName" /> <button class="btn btn-primary" onclick="addCategory()">新增</button></td></tr>
+</table>

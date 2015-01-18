@@ -1,0 +1,106 @@
+﻿@model HKAdBus.Models.DomainModels.Photo
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Photo</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Advertisement.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Advertisement.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BusModel.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BusModel.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Image)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Image)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreationDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreationDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BusCompany)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BusCompany)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BusRoute)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BusRoute)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FleetNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FleetNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LicencePlateNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LicencePlateNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Provider)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Provider)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Tags)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Tags)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FleetPrefixIndex)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FleetPrefixIndex)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.PhotoID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

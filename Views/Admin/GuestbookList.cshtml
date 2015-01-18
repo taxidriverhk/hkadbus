@@ -1,0 +1,42 @@
+﻿@using HKAdBus.Models.DomainModels
+@model HKAdBus.Models.EditorModels.GuestbookEditorViewModel
+@{
+    Layout = null;
+}
+
+@foreach (GuestBookEntry gbe in Model.GuestBookEntries)
+{
+    <table>
+        <tr><td>號碼: @gbe.ID</td></tr>
+        <tr>
+            <td>
+                留言者名稱: @gbe.Name<br />
+                留言時間: @String.Format("{0:yyyy-MM-dd HH:mm:ss}", gbe.CreationTime)<br />
+                @if (!String.IsNullOrEmpty(gbe.Email))
+                { <span>聯絡電郵: @gbe.Email</span><br /> }
+                @if (!String.IsNullOrEmpty(gbe.Website))
+                { <span>個人網頁: <a href="@Url.Content(gbe.Website)">@Url.Content(gbe.Website)</a></span><br /> }
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @gbe.Message
+                <div>
+                    @if (!String.IsNullOrEmpty(gbe.Reply))
+                    {
+                        @:管理員在 @String.Format("{0:yyyy-MM-dd HH:mm:ss}", gbe.ReplyTime) 回覆:<br />
+                        @gbe.Reply
+                    }
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td id="editPost">
+                <button class="btn btn-default" onclick="replyPost(@gbe.ID)">回覆</button> | 
+                <button class="btn btn-danger" onclick="deletePost(@gbe.ID)">刪除</button>
+            </td>
+        </tr>
+    </table>
+    <p></p>
+}

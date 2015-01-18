@@ -1,0 +1,43 @@
+﻿@model HKAdBus.Models.DomainModels.Photo
+
+@{
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    ViewBag.Title = "Delete";
+}
+
+<h3>刪除相片</h3>
+<h4>確定要刪除本相片?</h4>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>@Html.DisplayNameFor(model => model.Advertisement.Name)</dt>
+        <dd>@Html.DisplayFor(model => model.Advertisement.Name)</dd>
+        <dt>@Html.DisplayNameFor(model => model.BusModel.Name)</dt>
+        <dd>@Html.DisplayFor(model => model.BusModel.Name)</dd>
+        <dt>@Html.DisplayNameFor(model => model.Image)</dt>
+        <dd>@Html.DisplayFor(model => model.Image)</dd>
+        <dt>@Html.DisplayNameFor(model => model.CreationDate)</dt>
+        <dd>@Html.DisplayFor(model => model.CreationDate)</dd>
+        <dt>@Html.DisplayNameFor(model => model.BusCompany)</dt>
+        <dd>@Html.DisplayFor(model => model.BusCompany)</dd>
+        <dt>@Html.DisplayNameFor(model => model.BusRoute)</dt>
+        <dd>@Html.DisplayFor(model => model.BusRoute)</dd>
+        <dt>@Html.DisplayNameFor(model => model.FleetNumber)</dt>
+        <dd>@Html.DisplayFor(model => model.FleetNumber)</dd>
+        <dt>@Html.DisplayNameFor(model => model.LicencePlateNumber)</dt>
+        <dd>@Html.DisplayFor(model => model.LicencePlateNumber)</dd>
+        <dt>@Html.DisplayNameFor(model => model.Provider)</dt>
+        <dd>@Html.DisplayFor(model => model.Provider)</dd>
+        <dt>@Html.DisplayNameFor(model => model.Tags)</dt>
+        <dd>@Html.DisplayFor(model => model.Tags)</dd>
+        <dt>@Html.DisplayNameFor(model => model.FleetPrefixIndex)</dt>
+        <dd>@Html.DisplayFor(model => model.FleetPrefixIndex)</dd>
+    </dl>
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+        <div class="form-actions no-color">
+            <input type="submit" value="刪除" class="btn btn-default btn-danger" /> 
+            <input type="button" value="取消" class="btn btn-default" onclick="document.location='@Url.Action("Index", "Admin")'" ; />
+        </div>
+    }
+</div>

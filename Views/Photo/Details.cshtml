@@ -1,0 +1,116 @@
+﻿@using HKAdBus.Models.EditorModels
+@model HKAdBus.Models.EditorModels.PhotoDetailsViewModel
+@{
+    var advertisement = Model.Photo.Advertisement;
+    string creationDateString = String.Format("{0:yyyy-MM-dd}", Model.Photo.CreationDate);
+    string fleetNumberPrefixString = Model.Photo.BusModel.FleetPrefix.Split(',')[@Model.Photo.FleetPrefixIndex];
+    ViewBag.Title = "相片詳細資料";
+}
+@Scripts.Render("~/bundles/jquery")
+@helper displayTags(string tags)
+{
+    List<string> tagList = tags.Split(',').ToList();
+    foreach(string t in tagList)
+    {
+        <a href="@Url.Content("~/Photo/Search?includeTag=on&tag=" + @t)">@t</a>
+    }
+}
+<style>
+    #detailsTable {
+        width: 100%;
+    }
+        #detailsTable td {
+            border: 1px solid #808080;
+            padding-left: 5px;
+            padding-top: 5px;
+        }
+        #detailsTable td:hover {
+            background-color: #e5e5e5;
+        }
+        #detailsTable td img {
+            cursor: pointer;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+    #licencePlate {
+        width: 35%;
+        display: inline-block;
+        background-color: yellow;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    #enlarge {
+        color: #808080;
+        font-size: 12px;
+    }
+
+    .myModal {
+
+    }
+</style>
+<script src="@Url.Content("~/Scripts/bootstrap.js")"></script>
+<script src="@Url.Content("~/Scripts/bootbox.js")"></script>
+<script>
+    $(function () {
+        var img = new Image();
+        img.src = "@Url.Content(Model.Photo.Image)";
+
+        $("#busPhoto").click(function () {
+            bootbox.dialog({
+                "message": "<img src=\"@Url.Content(Model.Photo.Image)\" />",
+                "className": "myModal",
+                "closeButton": true,
+                "backdrop": true,
+            });
+            $(".myModal .modal-content").css("width", img.width + 40);
+            $(".myModal").css("margin-left", -1 * $(".myModal .modal-content").width() * 0.45);
+            $(".modal-dialog").css("padding-top", "60px");
+        });
+    });
+</script>
+<h5>
+    <a href="@Url.Content("~/Photo/Categories")">廣告分類</a>  &gt;
+    <a href="@Url.Content("~/Photo/Category/" + @advertisement.Category.CategoryID)">@advertisement.Category.Name</a> &gt;
+    <a href="@Url.Content("~/Photo/Advertisement/" + @advertisement.AdvertisementID)">@advertisement.Name</a> &gt;
+    相片詳細資料
+</h5>
+<br />
+<table id="detailsTable">
+    <tr>
+        <td rowspan="2" style="width:70%;">
+            <img id="busPhoto" src="@Url.Content(Model.Photo.Image)" /><br />
+            <span id="enlarge">按圖放大</span>
+        </td>
+        <td style="vertical-align:middle;">
+            拍攝者/上傳者: @Model.Photo.Provider 
+            <a href="@Url.Content("~/Photo/Search?includeProvider=on&provider=" + @Model.Photo.Provider)">(相同上傳者之照片)</a><br />
+            上傳日期: @creationDateString 
+            <a href="@Url.Content("~/Photo/Search?includeCreationDate=on&startDate=" + @creationDateString + "&endDate=" + @creationDateString)">(相同上傳日期之照片)</a><br />
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align:middle;">
+            路線: @Model.Photo.BusRoute 
+            <a href="@Url.Content("~/Photo/Search?includeRoute=on&route=" + @Model.Photo.BusRoute)">
+                (相同路線之相片)
+            </a><br />
+            車隊編號: @fleetNumberPrefixString@Model.Photo.FleetNumber 
+            <a href="@Url.Content("~/Photo/Search?includeFleet=on&fleetNumberPrefix=" + @fleetNumberPrefixString)">
+                (相同車隊之相片)
+            </a><br />
+            車牌號碼: <div id="licencePlate">@Model.Photo.LicencePlateNumber</div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            巴士型號: @Model.Photo.BusModel.Name<br />
+            巴士公司: @PhotoDetailsViewModel.GetBusCompany(Model.Photo.BusCompany)<br />
+            廣告類別: @Model.Photo.Advertisement.Category.Name<br />
+            車身廣告: @Model.Photo.Advertisement.Name<br /><br />
+            標籤: @displayTags(Model.Photo.Tags)
+        </td>
+    </tr>
+</table>
